@@ -19,38 +19,24 @@ export const getAppointmentsForDay = (state, targetDay) => {
 export const getInterview = (state, interview) => {
   if (!interview) return null;
 
-
   return {
     student: interview.student,
-    interviewer:
-      state.interviewers[interview.interviewer]
+    interviewer: state.interviewers[interview.interviewer],
   };
 };
 
 export const getInterviewersForDay = (state, targetDay) => {
-  const { days,  interviewers,appointments } = state;
+  const { days, interviewers } = state;
 
-  let  targetInterviewers = [];
+  let targetInterviewers = [];
 
   for (const day of days) {
     if (day.name === targetDay) {
-      targetInterviewers = [
-        ...day.appointments.map((id) => {
-          const appointment = appointments[id];
-          if (appointment.interview){
-            return interviewers[appointment.interview.interviewer];
-          }
-          else{
-            return null;
-          }
-
-        }),
-      ];
+      targetInterviewers = day.interviewers.map((id) => {
+        return interviewers[id];
+      });
     }
   }
 
-  targetInterviewers = targetInterviewers.filter ((value)=>value !== null);
-
-
-  return  targetInterviewers;
+  return targetInterviewers;
 };

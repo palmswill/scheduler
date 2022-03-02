@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-import { getAppointmentsForDay, getInterview } from "helpers/selectors";
+import {
+  getAppointmentsForDay,
+  getInterview,
+  getInterviewersForDay,
+} from "helpers/selectors";
 
 import "components/Application.scss";
 import DayList from "./DayList";
@@ -14,8 +18,76 @@ export default function Application(props) {
     interviewers: [],
   });
 
-
   const setDay = (day) => setState({ ...state, day });
+
+  function bookInterview(id, interview, setLoadingStatus, ERROR, SHOW) {
+    const appointment = {
+      ...state.appointments[id],
+      interview: { ...interview },
+    };
+
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment,
+    };
+
+    axios
+      .put(`http://localhost:8001/api/appointments/${id}`, appointment)
+      .then((res) => {
+        if (res.status === 204) {
+          setState({
+            ...state,
+            appointments,
+          });
+          setLoadingStatus(SHOW);
+        } else {
+          setLoadingStatus(ERROR);
+        }
+      })
+      .catch(() => {
+        setLoadingStatus(ERROR);
+      });
+  }
+
+  function save(name, interviewer) {
+    const interview = {
+      student: name,
+      interviewer,
+    };
+
+    return interview;
+  }
+
+  function deleteInterview(id, setLoadingStatus, ERROR, EMPTY) {
+    const appointment = {
+      ...state.appointments[id],
+      interview: null,
+    };
+
+    const appointments = {
+      ...state.appointments,
+      [id]: appointment,
+    };
+
+    axios
+      .delete(`http://localhost:8001/api/appointments/${id}`)
+      .then((res) => {
+        if (res.status === 204) {
+          setState({
+            ...state,
+            appointments,
+          });
+          setLoadingStatus(EMPTY);
+        } else {
+          console.log(res);
+          setLoadingStatus(ERROR,true);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoadingStatus(ERROR,true);
+      });
+  }
 
   useEffect(() => {
     Promise.all([
@@ -24,7 +96,6 @@ export default function Application(props) {
       axios.get("http://localhost:8001/api/interviewers"),
     ]).then((results) => {
       setState((preState) => {
-        
         return {
           ...preState,
           days: results[0].data,
@@ -39,8 +110,15 @@ export default function Application(props) {
 
   const schedule = dailyAppointments.map((appointment) => {
     const { id, time, interview } = appointment;
+    const interviewers = getInterviewersForDay(state, state.day);
     const dInterview = getInterview(state, interview);
-    return <Appointment key={id} id={id} time={time} interview={dInterview} />;
+    return (
+      <Appointment
+        key={id}
+        {...{ id, time, save, bookInterview, deleteInterview, interviewers }}
+        interview={dInterview}
+      />
+    );
   });
 
   return (

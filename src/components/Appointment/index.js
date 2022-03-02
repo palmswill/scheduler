@@ -5,12 +5,27 @@ import Show from "./Show";
 import Empty from "./Empty";
 import useVisualMode from "hooks/useVisualMode";
 import Form from "./Form";
+import Status from "./Status";
+import Confirm from "./Confirm";
+import Error from "./Error";
 
-const Appointment = ({ time, interview, interviewers = [] }) => {
+const Appointment = ({
+  id,
+  save,
+  time,
+  interview,
+  bookInterview,
+  deleteInterview,
+  interviewers = [],
+}) => {
   const EMPTY = "EMPTY";
   const SHOW = "SHOW";
   const CREATE = "CREATE";
   const EDIT = "EDIT";
+  const SAVE = "SAVE";
+  const DELETE = "DELETE";
+  const ERROR = "ERROR";
+  const CONFIRM = "CONFIRM";
   const { mode, transition, back } = useVisualMode(interview ? SHOW : EMPTY);
 
   return (
@@ -26,8 +41,9 @@ const Appointment = ({ time, interview, interviewers = [] }) => {
       {mode === CREATE && (
         <Form
           interviewers={interviewers}
-          onSave={() => {
-            transition(SHOW);
+          onSave={(name, interviewer) => {
+            transition(SAVE);
+            bookInterview(id, save(name, interviewer), transition, ERROR, SHOW);
           }}
           onCancel={back}
         />
@@ -36,9 +52,10 @@ const Appointment = ({ time, interview, interviewers = [] }) => {
         <Form
           interviewers={interviewers}
           student={interview.student}
-          interviewer={interview.interviewer}
-          onSave={() => {
-            transition(SHOW);
+          interviewer={interview.interviewer.id}
+          onSave={(name, interviewer) => {
+            transition(SAVE);
+            bookInterview(id, save(name, interviewer), transition, ERROR, SHOW);
           }}
           onCancel={back}
         />
@@ -48,11 +65,24 @@ const Appointment = ({ time, interview, interviewers = [] }) => {
           student={interview.student}
           interviewer={interview.interviewer}
           onDelete={() => {
-            transition(EMPTY);
+            transition(CONFIRM);
           }}
           onEdit={() => transition(EDIT)}
         />
       )}
+      {mode === CONFIRM && (
+        <Confirm
+          message={"Are you sure you would like to delete this?"}
+          onConfirm={() => {
+            transition(DELETE,true);
+            deleteInterview(id, transition, ERROR, EMPTY);
+          }}
+          onCancel={back}
+        />
+      )}
+      {mode === SAVE && <Status message="SAVING" />}
+      {mode === DELETE && <Status message="DELETING" />}
+      {mode === ERROR && <Error onClose={back}/>}
     </article>
   );
 };
