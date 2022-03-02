@@ -14,6 +14,7 @@ export default function Application(props) {
     interviewers: [],
   });
 
+
   const setDay = (day) => setState({ ...state, day });
 
   useEffect(() => {
@@ -23,6 +24,7 @@ export default function Application(props) {
       axios.get("http://localhost:8001/api/interviewers"),
     ]).then((results) => {
       setState((preState) => {
+        
         return {
           ...preState,
           days: results[0].data,
@@ -37,10 +39,7 @@ export default function Application(props) {
 
   const schedule = dailyAppointments.map((appointment) => {
     const { id, time, interview } = appointment;
-
     const dInterview = getInterview(state, interview);
-    console.log(dInterview);
-
     return <Appointment key={id} id={id} time={time} interview={dInterview} />;
   });
 

@@ -26,3 +26,31 @@ export const getInterview = (state, interview) => {
       state.interviewers[interview.interviewer]
   };
 };
+
+export const getInterviewersForDay = (state, targetDay) => {
+  const { days,  interviewers,appointments } = state;
+
+  let  targetInterviewers = [];
+
+  for (const day of days) {
+    if (day.name === targetDay) {
+      targetInterviewers = [
+        ...day.appointments.map((id) => {
+          const appointment = appointments[id];
+          if (appointment.interview){
+            return interviewers[appointment.interview.interviewer];
+          }
+          else{
+            return null;
+          }
+
+        }),
+      ];
+    }
+  }
+
+  targetInterviewers = targetInterviewers.filter ((value)=>value !== null);
+
+
+  return  targetInterviewers;
+};
