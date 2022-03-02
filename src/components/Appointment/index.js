@@ -16,6 +16,7 @@ const Appointment = ({
   interview,
   bookInterview,
   deleteInterview,
+  // default with no interviewers
   interviewers = [],
 }) => {
   const EMPTY = "EMPTY";
@@ -42,7 +43,9 @@ const Appointment = ({
         <Form
           interviewers={interviewers}
           onSave={(name, interviewer) => {
+            // load save animation
             transition(SAVE);
+            // start booking interview, pass in function to handle error or show;
             bookInterview(id, save(name, interviewer), transition, ERROR, SHOW);
           }}
           onCancel={back}
@@ -54,7 +57,11 @@ const Appointment = ({
           student={interview.student}
           interviewer={interview.interviewer.id}
           onSave={(name, interviewer) => {
+            // load save animation
+
             transition(SAVE);
+            // start booking interview, pass in function to handle error or show;
+
             bookInterview(id, save(name, interviewer), transition, ERROR, SHOW);
           }}
           onCancel={back}
@@ -74,7 +81,7 @@ const Appointment = ({
         <Confirm
           message={"Are you sure you would like to delete this?"}
           onConfirm={() => {
-            transition(DELETE,true);
+            transition(DELETE, true);
             deleteInterview(id, transition, ERROR, EMPTY);
           }}
           onCancel={back}
@@ -82,7 +89,7 @@ const Appointment = ({
       )}
       {mode === SAVE && <Status message="SAVING" />}
       {mode === DELETE && <Status message="DELETING" />}
-      {mode === ERROR && <Error onClose={back}/>}
+      {mode === ERROR && <Error onClose={back} />}
     </article>
   );
 };

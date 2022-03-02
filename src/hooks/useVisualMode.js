@@ -1,10 +1,16 @@
-import  { useState } from "react";
+import { useState } from "react";
 
 const useVisualMode = (initial) => {
-  const [mode, setMode] = useState(preState=>preState?preState:initial);
-  const [history, setHistory] = useState(preState=>preState?preState:[initial]);
+  // if have preState use preState, else use intial values
+  const [mode, setMode] = useState((preState) =>
+    preState ? preState : initial
+  );
+  const [history, setHistory] = useState((preState) =>
+    preState ? preState : [initial]
+  );
 
   const transition = (newMode, replace = false) => {
+    // if replace , remove one mode from history;
     if (replace) {
       setMode(newMode);
       setHistory([...history.filter((_, i) => i !== history.length - 1)]);
@@ -15,8 +21,11 @@ const useVisualMode = (initial) => {
   };
 
   const back = () => {
+    // only works if have more history to back
     if (history.length >= 1) {
+      // remove one mode from history;
       setHistory([...history.filter((_, i) => i !== history.length - 1)]);
+      // back to previous mode (top of history);
       setMode(history[history.length - 1]);
     }
   };
