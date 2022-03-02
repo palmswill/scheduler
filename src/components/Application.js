@@ -35,8 +35,16 @@ export default function Application(props) {
       .put(`http://localhost:8001/api/appointments/${id}`, appointment)
       .then((res) => {
         if (res.status === 204) {
+          const targetDay = state.days.filter(
+            (day) => day.name === state.day
+          )[0];
+
           setState({
             ...state,
+            days: [
+              ...state.days.filter((day) => day.name !== state.day),
+              { ...targetDay, spots: targetDay.spots - 1 },
+            ].sort((a, b) => a.id - b.id),
             appointments,
           });
           setLoadingStatus(SHOW);
@@ -73,19 +81,27 @@ export default function Application(props) {
       .delete(`http://localhost:8001/api/appointments/${id}`)
       .then((res) => {
         if (res.status === 204) {
+          const targetDay = state.days.filter(
+            (day) => day.name === state.day
+          )[0];
+
           setState({
             ...state,
+            days: [
+              ...state.days.filter((day) => day.name !== state.day),
+              { ...targetDay, spots: targetDay.spots + 1 },
+            ].sort((a, b) => a.id - b.id),
             appointments,
           });
           setLoadingStatus(EMPTY);
         } else {
           console.log(res);
-          setLoadingStatus(ERROR,true);
+          setLoadingStatus(ERROR, true);
         }
       })
       .catch((err) => {
         console.log(err);
-        setLoadingStatus(ERROR,true);
+        setLoadingStatus(ERROR, true);
       });
   }
 
