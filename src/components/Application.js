@@ -1,6 +1,5 @@
 import React from "react";
 
-
 import {
   getAppointmentsForDay,
   getInterview,
@@ -13,14 +12,8 @@ import Appointment from "./Appointment";
 import useApplicationData from "hooks/useApplicationData";
 
 export default function Application(props) {
-  const {
-    state,
-    setDay,
-    bookInterview,
-    save,
-    deleteInterview
-  } = useApplicationData();
-  
+  const { state, setDay, bookInterview, save, deleteInterview } =
+    useApplicationData();
 
   const dailyAppointments = getAppointmentsForDay(state, state.day);
 
@@ -56,7 +49,10 @@ export default function Application(props) {
           alt="Lighthouse Labs"
         />
       </section>
-      <section className="schedule">{schedule}</section>
+      <section className="schedule">
+        {schedule}
+        <Appointment time="5pm" />
+      </section>
     </main>
   );
 }
